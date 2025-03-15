@@ -103,7 +103,7 @@ const ImageCard = ({ image, onClick }) => {
           onError={(e) => {
             setImageError(true);
             setIsImageLoaded(true);
-            e.target.src = '/placeholder-image.jpg';
+            e.target.src = '/placeholder-image.webp';
           }}
         />
         
