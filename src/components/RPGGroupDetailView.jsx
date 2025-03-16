@@ -60,6 +60,11 @@ const RPGGroupDetailView = ({ group, directory, onClose, onImageSelect }) => {
                             </div>
                             
                             <div className="bg-gray-50 p-3 rounded">
+                                <h3 className="font-medium mb-1">ネガティブプロンプト</h3>
+                                <p className="text-sm text-gray-600">{group.negative_prompt}</p>
+                            </div>
+                            
+                            <div className="bg-gray-50 p-3 rounded">
                                 <h3 className="font-medium mb-1">生成パラメータ</h3>
                                 <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
                                     {Object.entries(group.generation_params).map(([key, value]) => (
