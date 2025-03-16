@@ -156,31 +156,4 @@ const RPGDetailView = ({ image, onClose }) => {
     );
 };
 
-// メタデータ文字列を解析する関数
-const parseMetadataString = (metadataString) => {
-    if (!metadataString) return {};
-
-    const result = {};
-
-    // Split by commas that are not within quotes
-    const parts = metadataString.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
-
-    parts.forEach(part => {
-        const colonIndex = part.indexOf(':');
-        if (colonIndex > 0) {
-            const key = part.substring(0, colonIndex).trim();
-            const value = part.substring(colonIndex + 1).trim();
-
-            // Remove quotes if present
-            const cleanValue = value.startsWith('"') && value.endsWith('"')
-                ? value.substring(1, value.length - 1)
-                : value;
-
-            result[key] = cleanValue;
-        }
-    });
-
-    return result;
-};
-
 export default RPGDetailView;
