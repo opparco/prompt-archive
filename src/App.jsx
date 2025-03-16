@@ -1,6 +1,5 @@
 import React from 'react';
 import { RouterProvider, createBrowserRouter, Navigate } from 'react-router-dom';
-import { MetadataProvider } from './context/MetadataContext';
 import Layout from './components/Layout';
 import RPGImageGallery from './pages/RPGImageGallery';
 import ErrorPage from './components/ErrorPage';
@@ -21,11 +20,6 @@ function App() {
         {
           path: "gallery",
           element: <RPGImageGallery />,
-          // ここでは例としてローダーを使用しています（実際の実装では必要に応じて調整）
-          loader: async () => {
-            // 将来的にAPIからデータを取得する場合に備えてloaderを設定
-            return { status: "success" };
-          },
         },
         {
           path: "*",
@@ -36,9 +30,7 @@ function App() {
   ]);
 
   return (
-    <MetadataProvider>
-      <RouterProvider router={router} fallbackElement={<Loader />} />
-    </MetadataProvider>
+    <RouterProvider router={router} fallbackElement={<Loader />} />
   );
 }
 
