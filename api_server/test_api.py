@@ -10,6 +10,27 @@ from pathlib import Path
 
 API_BASE_URL = "http://localhost:5000/api"
 
+# Import supported file extensions from library if running in same environment
+import sys
+import os
+import json
+import requests
+from pathlib import Path
+
+API_BASE_URL = "http://localhost:5000/api"
+
+# Import supported file extensions from library if running in same environment
+try:
+    from metadata_utils import SUPPORTED_FILE_EXTENSIONS, is_supported_file
+except ImportError:
+    # Fallback if import fails - define the same constants as in the library
+    SUPPORTED_FILE_EXTENSIONS = ['.webp', '.png']
+    
+    def is_supported_file(filename):
+        """Fallback implementation if import fails"""
+        ext = os.path.splitext(filename.lower())[1]
+        return ext in SUPPORTED_FILE_EXTENSIONS
+
 def test_directories(path):
     """Test the directories listing endpoint"""
     print(f"\n--- Testing directories listing ({path}) ---")
@@ -19,11 +40,11 @@ def test_directories(path):
     if response.status_code == 200:
         data = response.json()
         print(f"Current path: {data['current_path']}")
-        print(f"WEBP files in current directory: {data['webp_files_in_current']}")
+        print(f"Images in current directory: {data['total_images_in_current']}")
         print("Subdirectories:")
         
         for dir_info in data['directories']:
-            print(f"  - {dir_info['name']} ({dir_info['webp_count']} WEBP files)")
+            print(f"  - {dir_info['name']} ({dir_info['total_images']} images)")
             
         return True
     else:
@@ -100,10 +121,6 @@ def main():
         sys.exit(1)
         
     path = sys.argv[1]
-    
-    # if not Path(path).exists():
-    #     print(f"Error: The specified path {path} does not exist.")
-    #     sys.exit(1)
     
     print(f"Testing API server: {API_BASE_URL}")
     print(f"Target directory: {path}")

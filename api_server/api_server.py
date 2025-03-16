@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, send_from_directory, abort
 from flask_cors import CORS
 
 # Import the metadata extraction library
-from webp_metadata_library import extract_id_and_seed, read_parameters
+from metadata_utils import extract_id_and_seed, read_parameters, is_supported_file, SUPPORTED_FILE_EXTENSIONS
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes to work with React app
@@ -50,7 +50,8 @@ def search_images(directory):
     for root, _, files in os.walk(abs_directory):
         files.sort()  # Ensure consistent processing order
         for file in files:
-            if file.lower().endswith('.webp'):  # Only process WEBP files
+            # Check if the file has a supported extension
+            if is_supported_file(file):
                 filepath = os.path.join(root, file)
                 
                 # Extract id and seed
@@ -201,37 +202,45 @@ def list_directories():
         
     try:
         directories = []
-        files_count = 0
+        total_images = 0
         
         for item in os.listdir(abs_path):
             item_path = os.path.join(abs_path, item)
             if os.path.isdir(item_path):
-                # Count .webp files in this directory
+                # Count supported image files in this directory
                 try:
-                    webp_count = sum(1 for _ in os.listdir(item_path) if _.lower().endswith('.webp'))
+                    # Count total supported files
+                    dir_total = sum(1 for _ in os.listdir(item_path) if is_supported_file(_))
                     
                     # Calculate path relative to BASE_DIR for client use
                     rel_to_base = os.path.relpath(item_path, BASE_DIR)
                     
-                    directories.append({
+                    dir_info = {
                         "name": item,
                         "path": rel_to_base,
-                        "webp_count": webp_count
-                    })
+                        "total_images": dir_total
+                    }
+                    
+                    directories.append(dir_info)
                 except PermissionError:
                     # Skip directories we can't access
                     continue
-            elif item.lower().endswith('.webp'):
-                files_count += 1
+            else:
+                # Check if this file has a supported extension
+                if is_supported_file(item):
+                    total_images += 1
         
         # Calculate relative path for response
         rel_to_base = os.path.relpath(abs_path, BASE_DIR) if abs_path != BASE_DIR else ""
                 
-        return jsonify({
+        # Build response
+        response = {
             "current_path": rel_to_base,
             "directories": directories,
-            "webp_files_in_current": files_count
-        })
+            "total_images_in_current": total_images
+        }
+            
+        return jsonify(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -253,4 +262,5 @@ if __name__ == '__main__':
     
     print(f"Starting server on http://{args.host}:{args.port}")
     print(f"Base directory: {BASE_DIR}")
+    print(f"Supported file extensions: {', '.join(SUPPORTED_FILE_EXTENSIONS)}")
     app.run(host=args.host, port=args.port, debug=args.debug)

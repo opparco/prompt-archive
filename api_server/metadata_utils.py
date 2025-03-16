@@ -1,13 +1,21 @@
 """
-Library for extracting and parsing metadata from WEBP image files.
+Library for extracting and parsing metadata from image files.
 Designed to work with AI-generated images that contain prompt information.
 """
 
 import re
+import os
 from typing import Dict, List, Optional, Any, Union, Tuple
 from PIL import Image
 import piexif
 import piexif.helper
+
+# Define supported file extensions as a constant
+SUPPORTED_FILE_EXTENSIONS = ['.webp', '.png']
+
+# Compile regex patterns for performance
+EXTENSIONS_PATTERN = '|'.join(ext[1:] for ext in SUPPORTED_FILE_EXTENSIONS)  # extensions without dots
+ID_SEED_PATTERN = re.compile(fr"(\d+)-(\d+)\.({EXTENSIONS_PATTERN})")
 
 class MetadataExtractor:
     """
@@ -53,7 +61,7 @@ class MetadataExtractor:
     @staticmethod
     def extract_id_and_seed(filename: str) -> Tuple[Optional[int], Optional[int]]:
         """
-        Extract ID and seed from filename based on the format "{id}-{seed}.webp".
+        Extract ID and seed from filename based on the format "{id}-{seed}.ext".
         
         Args:
             filename: Name of the file
@@ -61,10 +69,24 @@ class MetadataExtractor:
         Returns:
             Tuple of (ID, seed) or (None, None) if not found
         """
-        match = re.match(r"(\d+)-(\d+)\.webp", filename)
+        match = ID_SEED_PATTERN.match(filename.lower())
         if match:
             return int(match.group(1)), int(match.group(2))
         return None, None
+    
+    @staticmethod
+    def is_supported_file(filename: str) -> bool:
+        """
+        Check if the file has a supported extension.
+        
+        Args:
+            filename: Name of the file
+            
+        Returns:
+            bool: True if the file has a supported extension
+        """
+        ext = os.path.splitext(filename.lower())[1]
+        return ext in SUPPORTED_FILE_EXTENSIONS
     
     @staticmethod
     def parse_metadata(raw_metadata: str) -> Dict[str, Any]:
@@ -196,3 +218,14 @@ def parse_metadata(raw_metadata: str) -> Dict[str, Any]:
 def read_info_from_image(im: Image.Image) -> str:
     """Wrapper for MetadataExtractor.read_info_from_image"""
     return MetadataExtractor.read_info_from_image(im)
+
+def is_supported_file(filename: str) -> bool:
+    """Wrapper for MetadataExtractor.is_supported_file"""
+    return MetadataExtractor.is_supported_file(filename)
+
+# For backward compatibility
+def is_supported_image(filename: str) -> bool:
+    """Alias for is_supported_file (deprecated)"""
+    import warnings
+    warnings.warn("is_supported_image is deprecated, use is_supported_file instead", DeprecationWarning, stacklevel=2)
+    return is_supported_file(filename)
