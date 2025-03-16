@@ -23,8 +23,8 @@ This project provides a REST API for grouping images (WebP, PNG, and other suppo
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/image-api-server.git
-cd image-api-server
+git clone https://github.com/opparco/prompt-archive.git
+cd prompt-archive/api_server
 ```
 
 2. Install required packages:
