@@ -2,6 +2,7 @@
 import RPGWindow from "./RPGWindow.jsx";
 import RPGButton from "./RPGButton.jsx";
 import { FaTimes } from 'react-icons/fa';
+import { useState } from 'react';
 
 // よく使われるタグの定義
 const COMMON_TAGS = [
@@ -12,16 +13,23 @@ const COMMON_TAGS = [
     'anime',
 ];
 
-const RPGSearchBar = ({ searchTerm, setSearchTerm, onSearch }) => {
+const RPGSearchBar = ({ onSearch }) => {
+    const [searchTerm, setSearchTerm] = useState('');
+
     const handleTagClick = (tag) => {
         const prefix = searchTerm ? `${searchTerm} ` : '';
         setSearchTerm(`${prefix}${tag}`);
     };
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSearch(searchTerm);
+    };
+
     return (
         <div className="mb-6">
             <RPGWindow title="検索">
-                <form onSubmit={onSearch} className="flex flex-col sm:flex-row gap-3">
+                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
                     <div className="flex-grow relative">
                         <input
                             type="text"
@@ -33,10 +41,7 @@ const RPGSearchBar = ({ searchTerm, setSearchTerm, onSearch }) => {
                         {searchTerm && (
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setSearchTerm('');
-                                    onSearch();
-                                }}
+                                onClick={() => setSearchTerm('')}
                                 className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer hover:text-gray-900"
                                 title="検索をクリア"
                             >

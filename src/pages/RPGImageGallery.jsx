@@ -3,15 +3,12 @@ import {useEffect, useState} from "react";
 import RPGSearchBar from "../components/RPGSearchBar.jsx";
 import RPGWindow from "../components/RPGWindow.jsx";
 import RPGDetailView from "../components/RPGDetailView.jsx";
-import RPGNavbar from "../components/RPGNavbar.jsx";
 import RPGImageCard from "../components/RPGImageCard.jsx";
 import RPGGroupDetailView from "../components/RPGGroupDetailView.jsx";
-import { FaSearch, FaTimes } from 'react-icons/fa';
+import { FaTimes } from 'react-icons/fa';
 import apiClient from '../services/apiClient';
 
 const RPGImageGallery = () => {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [activeNav, setActiveNav] = useState('gallery');
     const [selectedImage, setSelectedImage] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [imageGroups, setImageGroups] = useState([]);
@@ -54,8 +51,7 @@ const RPGImageGallery = () => {
     }, [currentDirectory]);
 
     // 検索機能
-    const handleSearch = (e) => {
-        e && e.preventDefault();
+    const handleSearch = (searchTerm) => {
         if (currentDirectory) {
             setLoading(true);
             apiClient.getImageGroups(currentDirectory, searchTerm)
@@ -94,7 +90,11 @@ const RPGImageGallery = () => {
 
     return (
         <div className="bg-gray-100 min-h-screen pb-12 font-mono">
-            <RPGNavbar active={activeNav} onNavChange={setActiveNav} />
+            <div className="bg-gray-100 py-2 border-b-2 border-gray-600 mb-6">
+                <div className="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center">
+                    <div className="text-lg font-bold text-gray-800 mb-0">プロンプトアーカイブ</div>
+                </div>
+            </div>
 
             <div className="flex">
                 {/* 左サイドバーとしてのフォルダー選択 */}
@@ -139,11 +139,7 @@ const RPGImageGallery = () => {
 
                 {/* メインコンテンツエリア */}
                 <div className="flex-1 px-4">
-                    <RPGSearchBar
-                        searchTerm={searchTerm}
-                        setSearchTerm={setSearchTerm}
-                        onSearch={handleSearch}
-                    />
+                    <RPGSearchBar onSearch={handleSearch} />
 
                     <RPGWindow title="ギャラリー">
                         {!currentDirectory ? (
