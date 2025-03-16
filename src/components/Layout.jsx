@@ -1,6 +1,5 @@
 import React from 'react';
 import { Outlet, useNavigation } from 'react-router-dom';
-import RPGNavbar from './RPGNavbar';
 import Loader from './Loader';
 
 const Layout = () => {
