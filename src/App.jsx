@@ -3,8 +3,6 @@ import { RouterProvider, createBrowserRouter, Navigate } from 'react-router-dom'
 import { MetadataProvider } from './context/MetadataContext';
 import Layout from './components/Layout';
 import RPGImageGallery from './pages/RPGImageGallery';
-import Analytics from './pages/Analytics';
-import Settings from './pages/Settings';
 import ErrorPage from './components/ErrorPage';
 import Loader from './components/Loader';
 
@@ -28,14 +26,6 @@ function App() {
             // 将来的にAPIからデータを取得する場合に備えてloaderを設定
             return { status: "success" };
           },
-        },
-        {
-          path: "analytics",
-          element: <Analytics />,
-        },
-        {
-          path: "settings",
-          element: <Settings />,
         },
         {
           path: "*",
