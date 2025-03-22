@@ -1,23 +1,16 @@
 // RPG スタイルの画像カード
 import RPGWindow from "./RPGWindow.jsx";
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import apiClient from '../services/apiClient';
 
 const RPGGroupDetailView = ({ group, onClose, onImageSelect }) => {
     const [selectedImage, setSelectedImage] = useState(group.images[0]);
-    const [selectedImageDetails, setSelectedImageDetails] = useState(null);
 
-    useEffect(() => {
-        const loadImageDetails = async () => {
-            try {
-                const details = await apiClient.getEntryDetails(selectedImage.id);
-                setSelectedImageDetails(details);
-            } catch (error) {
-                console.error('Failed to load image details:', error);
-            }
-        };
-        loadImageDetails();
-    }, [selectedImage.id]);
+    const { data: selectedImageDetails, isLoading } = useQuery({
+        queryKey: ['imageDetails', selectedImage.id],
+        queryFn: () => apiClient.getEntryDetails(selectedImage.id),
+    });
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -45,11 +38,11 @@ const RPGGroupDetailView = ({ group, onClose, onImageSelect }) => {
                     {/* 左側: メイン画像 */}
                     <div className="w-1/2 flex-shrink-0">
                         <div className="sticky top-4">
-                            {selectedImageDetails && (
+                            {selectedImageDetails && selectedImageDetails.image_url && (
                                 <img
                                     src={selectedImageDetails.image_url}
                                     className="w-full object-contain"
-                                    onClick={() => onImageSelect(selectedImageDetails)}
+                                    onClick={() => onImageSelect(selectedImage)}
                                 />
                             )}
                         </div>
@@ -57,7 +50,11 @@ const RPGGroupDetailView = ({ group, onClose, onImageSelect }) => {
 
                     {/* 右側: メタデータとバリアント */}
                     <div className="w-1/2 space-y-4">
-                        {selectedImageDetails && (
+                        {isLoading ? (
+                            <div className="flex justify-center items-center h-32">
+                                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-800"></div>
+                            </div>
+                        ) : selectedImageDetails && (
                             <div className="space-y-2">
                                 <div className="bg-gray-50 p-3 rounded">
                                     <h3 className="font-medium mb-1">プロンプト</h3>

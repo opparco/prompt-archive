@@ -2,68 +2,44 @@
 import {useEffect, useState} from "react";
 import RPGSearchBar from "../components/RPGSearchBar.jsx";
 import RPGWindow from "../components/RPGWindow.jsx";
-import RPGDetailView from "../components/RPGDetailView.jsx";
 import RPGImageCard from "../components/RPGImageCard.jsx";
 import RPGGroupDetailView from "../components/RPGGroupDetailView.jsx";
 import { FaTimes } from 'react-icons/fa';
 import apiClient from '../services/apiClient';
+import { useQuery } from '@tanstack/react-query';
 
 const RPGImageGallery = () => {
-    const [selectedImage, setSelectedImage] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [imageGroups, setImageGroups] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [currentDirectory, setCurrentDirectory] = useState(null);
     const [directories, setDirectories] = useState([]);
     const [directoryFilter, setDirectoryFilter] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
 
     // ディレクトリ一覧の取得
-    useEffect(() => {
-        const fetchDirectories = async () => {
-            try {
-                const data = await apiClient.getDirectories();
-                setDirectories(data.directories);
-            } catch (error) {
-                console.error('ディレクトリの取得に失敗しました:', error);
-            }
-        };
+    const { data: directoriesData } = useQuery({
+        queryKey: ['directories'],
+        queryFn: () => apiClient.getDirectories(),
+    });
 
-        fetchDirectories();
-    }, []);
+    useEffect(() => {
+        if (directoriesData) {
+            setDirectories(directoriesData.directories);
+        }
+    }, [directoriesData]);
 
     // 画像グループの取得
+    const { data: groupsData, isLoading } = useQuery({
+        queryKey: ['imageGroups', currentDirectory, searchTerm],
+        queryFn: () => apiClient.getImageGroups(currentDirectory, searchTerm),
+        enabled: !!currentDirectory, // currentDirectory が存在する場合のみ実行
+    });
+
     useEffect(() => {
-        if (!currentDirectory) return;
-
-        const fetchImageGroups = async () => {
-            setLoading(true);
-            try {
-                const data = await apiClient.getImageGroups(currentDirectory);
-                setImageGroups(data.groups);
-            } catch (error) {
-                console.error('画像グループの取得に失敗しました:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchImageGroups();
-    }, [currentDirectory]);
-
-    // 検索機能
-    const handleSearch = async (searchTerm) => {
-        if (currentDirectory) {
-            setLoading(true);
-            try {
-                const data = await apiClient.getImageGroups(currentDirectory, searchTerm);
-                setImageGroups(data.groups);
-            } catch (error) {
-                console.error('検索に失敗しました:', error);
-            } finally {
-                setLoading(false);
-            }
+        if (groupsData) {
+            setImageGroups(groupsData.groups);
         }
-    };
+    }, [groupsData]);
 
     // グループ選択ハンドラ
     const handleGroupSelect = (group) => {
@@ -78,7 +54,12 @@ const RPGImageGallery = () => {
     // ディレクトリの変更
     const handleDirectoryChange = (newDirectory) => {
         setCurrentDirectory(newDirectory);
-        setImageGroups([]);
+        setSearchTerm(''); // ディレクトリ変更時に検索条件をリセット
+    };
+
+    // 検索機能
+    const handleSearch = (term) => {
+        setSearchTerm(term);
     };
 
     // フィルタされたディレクトリリストを取得
@@ -144,7 +125,7 @@ const RPGImageGallery = () => {
                             <div className="flex justify-center items-center h-64 text-gray-500">
                                 表示するフォルダーを選択してください
                             </div>
-                        ) : loading ? (
+                        ) : isLoading ? (
                             <div className="flex justify-center items-center h-64">
                                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-800"></div>
                             </div>
@@ -169,14 +150,6 @@ const RPGImageGallery = () => {
                     group={selectedGroup}
                     onClose={() => setSelectedGroup(null)}
                     onImageSelect={handleImageSelect}
-                />
-            )}
-
-            {/* 画像詳細モーダル */}
-            {selectedImage && (
-                <RPGDetailView
-                    image={selectedImage}
-                    onClose={() => setSelectedImage(null)}
                 />
             )}
         </div>

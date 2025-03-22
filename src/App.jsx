@@ -4,6 +4,18 @@ import Layout from './components/Layout';
 import RPGImageGallery from './pages/RPGImageGallery';
 import ErrorPage from './components/ErrorPage';
 import Loader from './components/Loader';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// クライアントの設定
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false, // ウィンドウフォーカス時の再取得を無効化
+      staleTime: 8 * 60 * 60 * 1000, // 8時間
+      cacheTime: 24 * 60 * 60 * 1000, // 24時間
+    },
+  },
+});
 
 function App() {
   // createBrowserRouterを使ってルートを定義
@@ -30,7 +42,9 @@ function App() {
   ]);
 
   return (
-    <RouterProvider router={router} fallbackElement={<Loader />} />
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} fallbackElement={<Loader />} />
+    </QueryClientProvider>
   );
 }
 
