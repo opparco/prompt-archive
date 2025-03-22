@@ -112,7 +112,7 @@ const RPGGroupDetailView = ({ group, location }) => {
                             {/* バリアント */}
                             <div>
                                 <h3 className="font-medium mb-2">バリアント ({group.images.length})</h3>
-                                <div className="grid grid-cols-4 gap-2">
+                                <div className="grid grid-cols-3 gap-2">
                                     {group.images.map((image) => (
                                         <div 
                                             key={image.id}
