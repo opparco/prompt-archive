@@ -13,47 +13,14 @@ This project is a web application that allows users to easily browse and manage 
 
 ## Architecture
 
-The project consists of two main components:
-
-1. **Python REST API Server**:
-   - Metadata extraction from image files
-   - Directory structure provision
-   - Image grouping processing
-
-2. **React Frontend Application**:
-   - User interface
-   - API communication and data display
-   - Search functionality implementation
+The project is a React-based web application that communicates with the [prompt-vault](https://github.com/opparco/prompt-vault) API server to access and process image metadata.
 
 ## Setup Instructions
 
 ### Prerequisites
 
-- Python 3.6 or higher
 - Node.js 18.0 or higher
 - npm/yarn
-
-### API Server Setup
-
-1. Navigate to the api_server directory:
-   ```bash
-   cd api_server
-   ```
-
-2. Install the required Python packages:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Start the API server (specify the directory where your images are stored):
-   ```bash
-   python api_server.py --base-dir /path/to/your/images --port 5000
-   ```
-   
-   Example: Using Stable Diffusion WebUI's default output directory:
-   ```bash
-   python api_server.py --base-dir C:/path/to/stable-diffusion-webui/outputs/txt2img-images
-   ```
 
 ### Frontend Setup
 
@@ -64,12 +31,18 @@ The project consists of two main components:
    npm install
    ```
 
-3. Start the development server:
+3. Configure the API endpoint in your environment:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your API endpoint
+   ```
+
+4. Start the development server:
    ```bash
    npm run dev
    ```
 
-4. Access the application in your browser at `http://localhost:5173`.
+5. Access the application in your browser at `http://localhost:5173`.
 
 ## Usage
 
@@ -80,29 +53,24 @@ The project consists of two main components:
 
 ## Security
 
-The API server implements security features to prevent directory traversal attacks:
-- All paths are validated against the base directory
-- Clients cannot access files outside the specified base directory
-- Relative paths are automatically resolved to prevent path manipulation
+The application implements security features to prevent unauthorized access:
+- API authentication and authorization
+- Secure communication with the API server
+- Input validation and sanitization
 
 ## Project Structure
-
-### API Server (Python)
-
-- `api_server.py` - Main Flask server
-- `metadata_utils.py` - Library for extracting and parsing image metadata
 
 ### Frontend (React)
 
 - `src/App.jsx` - Routing and main application structure
 - `src/pages/RPGImageGallery.jsx` - Main gallery page
 - `src/components/` - RPG-style UI elements and functional components
-- `src/services/apiClient.js` - Service for communicating with the REST API
+- `src/services/apiClient.js` - Service for communicating with the prompt-vault API
 
 ## Customization
 
 - `src/components/RPGWindow.jsx` - Customize UI styles
-- `api_server.py` - Adjust server behavior and grouping logic
+- `src/services/apiClient.js` - Adjust API communication settings
 
 ## License
 
