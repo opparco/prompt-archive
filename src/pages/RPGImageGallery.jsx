@@ -1,20 +1,21 @@
 // メイン Gallery ページ
 import {useEffect, useState} from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import RPGSearchBar from "../components/RPGSearchBar.jsx";
 import RPGWindow from "../components/RPGWindow.jsx";
 import RPGImageCard from "../components/RPGImageCard.jsx";
-import RPGGroupDetailView from "../components/RPGGroupDetailView.jsx";
 import { FaTimes } from 'react-icons/fa';
 import apiClient from '../services/apiClient';
 import { useQuery } from '@tanstack/react-query';
 
 const RPGImageGallery = () => {
-    const [selectedGroup, setSelectedGroup] = useState(null);
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [imageGroups, setImageGroups] = useState([]);
-    const [currentDirectory, setCurrentDirectory] = useState(null);
+    const [currentDirectory, setCurrentDirectory] = useState(searchParams.get('directory') || null);
     const [directories, setDirectories] = useState([]);
     const [directoryFilter, setDirectoryFilter] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
 
     // ディレクトリ一覧の取得
     const { data: directoriesData } = useQuery({
@@ -43,23 +44,33 @@ const RPGImageGallery = () => {
 
     // グループ選択ハンドラ
     const handleGroupSelect = (group) => {
-        setSelectedGroup(group);
-    };
-
-    // 画像選択ハンドラ
-    const handleImageSelect = (image) => {
-        setSelectedImage(image);
+        // 現在の検索パラメータを保持
+        const currentParams = new URLSearchParams(searchParams);
+        navigate(`/group/${group.images[0].id}?${currentParams.toString()}`);
     };
 
     // ディレクトリの変更
     const handleDirectoryChange = (newDirectory) => {
         setCurrentDirectory(newDirectory);
         setSearchTerm(''); // ディレクトリ変更時に検索条件をリセット
+        // URLパラメータを更新
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('directory', newDirectory);
+        newParams.delete('search');
+        setSearchParams(newParams);
     };
 
     // 検索機能
     const handleSearch = (term) => {
         setSearchTerm(term);
+        // URLパラメータを更新
+        const newParams = new URLSearchParams(searchParams);
+        if (term) {
+            newParams.set('search', term);
+        } else {
+            newParams.delete('search');
+        }
+        setSearchParams(newParams);
     };
 
     // フィルタされたディレクトリリストを取得
@@ -143,15 +154,6 @@ const RPGImageGallery = () => {
                     </RPGWindow>
                 </div>
             </div>
-
-            {/* グループ詳細モーダル */}
-            {selectedGroup && (
-                <RPGGroupDetailView
-                    group={selectedGroup}
-                    onClose={() => setSelectedGroup(null)}
-                    onImageSelect={handleImageSelect}
-                />
-            )}
         </div>
     );
 };

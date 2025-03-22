@@ -2,6 +2,7 @@ import React from 'react';
 import { RouterProvider, createBrowserRouter, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import RPGImageGallery from './pages/RPGImageGallery';
+import RPGGroupDetailPage from './pages/RPGGroupDetailPage';
 import ErrorPage from './components/ErrorPage';
 import Loader from './components/Loader';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -32,6 +33,10 @@ function App() {
         {
           path: "gallery",
           element: <RPGImageGallery />,
+        },
+        {
+          path: "group/:id",
+          element: <RPGGroupDetailPage />,
         },
         {
           path: "*",
