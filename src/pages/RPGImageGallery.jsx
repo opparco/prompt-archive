@@ -21,8 +21,8 @@ const RPGImageGallery = () => {
     useEffect(() => {
         const fetchDirectories = async () => {
             try {
-                const { directories } = await apiClient.getDirectories();
-                setDirectories(directories);
+                const data = await apiClient.getDirectories();
+                setDirectories(data.directories);
             } catch (error) {
                 console.error('ディレクトリの取得に失敗しました:', error);
             }
@@ -38,8 +38,8 @@ const RPGImageGallery = () => {
         const fetchImageGroups = async () => {
             setLoading(true);
             try {
-                const { groups } = await apiClient.getImageGroups(currentDirectory);
-                setImageGroups(groups);
+                const data = await apiClient.getImageGroups(currentDirectory);
+                setImageGroups(data.groups);
             } catch (error) {
                 console.error('画像グループの取得に失敗しました:', error);
             } finally {
@@ -51,19 +51,17 @@ const RPGImageGallery = () => {
     }, [currentDirectory]);
 
     // 検索機能
-    const handleSearch = (searchTerm) => {
+    const handleSearch = async (searchTerm) => {
         if (currentDirectory) {
             setLoading(true);
-            apiClient.getImageGroups(currentDirectory, searchTerm)
-                .then(response => {
-                    setImageGroups(response.groups);
-                })
-                .catch(error => {
-                    console.error('検索に失敗しました:', error);
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
+            try {
+                const data = await apiClient.getImageGroups(currentDirectory, searchTerm);
+                setImageGroups(data.groups);
+            } catch (error) {
+                console.error('検索に失敗しました:', error);
+            } finally {
+                setLoading(false);
+            }
         }
     };
 
@@ -85,7 +83,7 @@ const RPGImageGallery = () => {
 
     // フィルタされたディレクトリリストを取得
     const filteredDirectories = directories.filter(dir =>
-        dir.name.toLowerCase().includes(directoryFilter.toLowerCase())
+        dir.toLowerCase().includes(directoryFilter.toLowerCase())
     );
 
     return (
@@ -122,15 +120,15 @@ const RPGImageGallery = () => {
                         <div className="flex flex-col gap-0.5 max-h-[calc(100vh-200px)] overflow-y-auto">
                             {filteredDirectories.map((dir) => (
                                 <button
-                                    key={dir.path}
+                                    key={dir}
                                     className={`px-2 py-1 rounded text-left text-sm ${
-                                        currentDirectory === dir.path 
+                                        currentDirectory === dir 
                                         ? 'bg-gray-800 text-white' 
                                         : 'bg-gray-100 hover:bg-gray-300'
                                     }`}
-                                    onClick={() => handleDirectoryChange(dir.path)}
+                                    onClick={() => handleDirectoryChange(dir)}
                                 >
-                                    {dir.name} ({dir.webp_count})
+                                    {dir}
                                 </button>
                             ))}
                         </div>
@@ -152,11 +150,10 @@ const RPGImageGallery = () => {
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {imageGroups.map(group => (
+                                {imageGroups.map((group, index) => (
                                     <RPGImageCard
-                                        key={group.group_id}
+                                        key={index}
                                         group={group}
-                                        directory={currentDirectory}
                                         onGroupSelect={handleGroupSelect}
                                     />
                                 ))}
@@ -170,7 +167,6 @@ const RPGImageGallery = () => {
             {selectedGroup && (
                 <RPGGroupDetailView
                     group={selectedGroup}
-                    directory={currentDirectory}
                     onClose={() => setSelectedGroup(null)}
                     onImageSelect={handleImageSelect}
                 />

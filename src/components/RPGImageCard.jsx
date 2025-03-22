@@ -1,25 +1,8 @@
 // RPG スタイルの画像カード
 import RPGWindow from "./RPGWindow.jsx";
-import apiClient from '../services/apiClient';
 
-const API_BASE_URL = 'http://localhost:5000/api';
-
-const RPGImageCard = ({ group, directory, onGroupSelect }) => {
+const RPGImageCard = ({ group, onGroupSelect }) => {
     const representativeImage = group.images[0];
-    
-    // APIレスポンスから直接メタデータを取得
-    const metadata = {
-        prompt: group.prompt,
-        generation_params: group.generation_params
-    };
-    
-    // 表示したい主要パラメータを抽出
-    const displayParams = {
-        'Steps': metadata.generation_params['Steps'],
-        'CFG scale': metadata.generation_params['CFG scale'],
-        'Seed': metadata.generation_params['Seed'],
-        'Model': metadata.generation_params['Model'],
-    };
     
     return (
         <div 
@@ -28,8 +11,7 @@ const RPGImageCard = ({ group, directory, onGroupSelect }) => {
         >
             <div className="relative">
                 <img
-                    src={apiClient.getImageUrl(directory, representativeImage.filename)}
-                    alt={representativeImage.filename}
+                    src={representativeImage.thumbnail_url}
                     className="w-full h-48 object-cover"
                 />
                 {group.images.length > 1 && (

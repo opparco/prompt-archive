@@ -1,33 +1,31 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:3000/api/v1';
+
+// Initialize auth token from environment variable
+if (import.meta.env.VITE_API_TOKEN) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${import.meta.env.VITE_API_TOKEN}`;
+}
 
 const apiClient = {
-    // ディレクトリ一覧の取得
+    // Get directories (dates)
     getDirectories: async () => {
         const response = await axios.get(`${API_BASE_URL}/directories`);
         return response.data;
     },
 
-    // 画像グループの取得
-    getImageGroups: async (directory, search = '') => {
-        const response = await axios.get(`${API_BASE_URL}/groups`, {
+    // Get image groups with optional directory and search filters
+    getImageGroups: async (directory = '', search = '') => {
+        const response = await axios.get(`${API_BASE_URL}/entries`, {
             params: { directory, search }
         });
         return response.data;
     },
 
-    // メタデータの取得
-    getMetadata: async (path, directory) => {
-        const response = await axios.get(`${API_BASE_URL}/metadata/${path}`, {
-            params: { directory }
-        });
+    // Get single entry details
+    getEntryDetails: async (entryId) => {
+        const response = await axios.get(`${API_BASE_URL}/entries/${entryId}`);
         return response.data;
-    },
-
-    // 画像URLの生成
-    getImageUrl: (directory, filename) => {
-        return `${API_BASE_URL}/images/${directory}/${filename}`;
     }
 };
 
