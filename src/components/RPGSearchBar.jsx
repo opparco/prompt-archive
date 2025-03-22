@@ -3,18 +3,11 @@ import RPGWindow from "./RPGWindow.jsx";
 import RPGButton from "./RPGButton.jsx";
 import { FaTimes } from 'react-icons/fa';
 import { useState } from 'react';
-
-// よく使われるタグの定義
-const COMMON_TAGS = [
-    'portrait',
-    'landscape',
-    'highquality',
-    'realistic',
-    'anime',
-];
+import { useCommonTags } from '../hooks/useCommonTags';
 
 const RPGSearchBar = ({ onSearch }) => {
     const [searchTerm, setSearchTerm] = useState('');
+    const { data, isLoading, error } = useCommonTags();
 
     const handleTagClick = (tag) => {
         const prefix = searchTerm ? `${searchTerm} ` : '';
@@ -57,18 +50,26 @@ const RPGSearchBar = ({ onSearch }) => {
                     </RPGButton>
                 </form>
 
-                <div className="mt-4 flex flex-wrap gap-2">
-                    <div className="text-sm text-gray-700 font-medium mr-2">よく使われるタグ:</div>
-                    {COMMON_TAGS.map((tag) => (
-                        <button
-                            key={tag}
-                            type="button"
-                            onClick={() => handleTagClick(tag)}
-                            className="bg-gray-200 px-2 py-1 text-xs rounded-md border border-gray-500 hover:bg-gray-300"
-                        >
-                            {tag}
-                        </button>
-                    ))}
+                <div className="mt-4">
+                    <div className="text-sm text-gray-700 font-medium mb-2">よく使われるタグ:</div>
+                    {isLoading ? (
+                        <div className="text-sm text-gray-600">読み込み中...</div>
+                    ) : error ? (
+                        <div className="text-sm text-red-600">{error.message}</div>
+                    ) : (
+                        <div className="flex flex-wrap gap-2">
+                            {data.tags.map((tag) => (
+                                <button
+                                    key={tag.name}
+                                    type="button"
+                                    onClick={() => handleTagClick(tag.name)}
+                                    className="bg-gray-200 px-2 py-1 text-xs rounded-md border border-gray-500 hover:bg-gray-300"
+                                >
+                                    {tag.name}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </RPGWindow>
         </div>

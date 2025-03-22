@@ -5,18 +5,8 @@ import RPGImageGallery from './pages/RPGImageGallery';
 import RPGGroupDetailPage from './pages/RPGGroupDetailPage';
 import ErrorPage from './components/ErrorPage';
 import Loader from './components/Loader';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-// クライアントの設定
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      staleTime: 24 * 3600 * 1000,
-      cacheTime: 48 * 3600 * 1000,
-    },
-  },
-});
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './lib/queryClient';
 
 function App() {
   // createBrowserRouterを使ってルートを定義

@@ -22,6 +22,17 @@ axios.interceptors.response.use(
 );
 
 const apiClient = {
+    // Get common tags
+    getCommonTags: async () => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/common-tags`);
+            return response.data;
+        } catch (error) {
+            console.error('Failed to fetch common tags:', error);
+            throw error;
+        }
+    },
+
     // Get directories (dates)
     getDirectories: async () => {
         try {
