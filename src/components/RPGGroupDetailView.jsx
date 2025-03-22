@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '../services/apiClient';
 import { useNavigate } from 'react-router-dom';
+import Loader from './Loader';
 
 const RPGGroupDetailView = ({ group, location }) => {
     const navigate = useNavigate();
@@ -79,7 +80,7 @@ const RPGGroupDetailView = ({ group, location }) => {
                         <div className="lg:w-1/3 space-y-4">
                             {isLoading ? (
                                 <div className="flex justify-center items-center h-32">
-                                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-800"></div>
+                                    <Loader size="sm" color="gray" showText={false} />
                                 </div>
                             ) : selectedImageDetails && (
                                 <div className="space-y-2">
@@ -111,7 +112,7 @@ const RPGGroupDetailView = ({ group, location }) => {
                             {/* バリアント */}
                             <div>
                                 <h3 className="font-medium mb-2">バリアント ({group.images.length})</h3>
-                                <div className="grid grid-cols-3 gap-2">
+                                <div className="grid grid-cols-4 gap-2">
                                     {group.images.map((image) => (
                                         <div 
                                             key={image.id}

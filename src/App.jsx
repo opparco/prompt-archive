@@ -3,7 +3,7 @@ import { RouterProvider, createBrowserRouter, Navigate } from 'react-router-dom'
 import Layout from './components/Layout';
 import RPGImageGallery from './pages/RPGImageGallery';
 import RPGGroupDetailPage from './pages/RPGGroupDetailPage';
-import ErrorPage from './components/ErrorPage';
+import ErrorPage from './pages/ErrorPage';
 import Loader from './components/Loader';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './lib/queryClient';
